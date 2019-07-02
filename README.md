@@ -1,7 +1,7 @@
 # easyreq
 Make HTTP requests in go as easy as possible!
 
-This package uses builtin ```net/http``` to make request package.
+This package uses builtin ```net/http``` to make requests.
 
 `json` and `xml` package will be used to unmarshal these types.
 
