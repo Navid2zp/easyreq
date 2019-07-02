@@ -54,7 +54,8 @@ You can also make a request using ```Make()``` function:
 
 ```
 res, err := easyreq.Make(
-	"post", "https://site.com/api", // URL
+	"post", // Request method
+	"https://site.com/api", // URL
 	[]byte(sendData), // Data to send
 	"json", // Request data type
 	"json", // Response data type
