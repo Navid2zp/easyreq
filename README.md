@@ -100,7 +100,7 @@ err := resp.ToXML(&result)
 err := resp.ToString(&result)
 ```
 
-Other usefull methods:
+Other useful methods:
 ```
 // Returns status code (200, ...)
 // Type: int
