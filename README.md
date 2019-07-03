@@ -124,7 +124,7 @@ Type: []byte, error
 resp.ReadBody()
 ```
 
-You can also access the originial response returned by ```http``` package by calling ```resp.Response```. (Will be a pointer to original response)
+You can also access the original response returned by ```http``` package by calling ```resp.Response```. (Will be a pointer to original response)
 
 
 License
