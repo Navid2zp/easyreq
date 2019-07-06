@@ -16,9 +16,9 @@ import (
 // Default is 'get' if you don't set one.
 func (r *Request) getMethod() string {
 	if r.Method == "" {
-		return "get"
+		return "GET"
 	}
-	return r.Method
+	return strings.ToUpper(r.Method)
 }
 
 // Send the final request
@@ -40,8 +40,7 @@ func (r *Request) Make() (*RequestResponse, error) {
 		req.Header.Set(key, value)
 	}
 
-	client := &http.Client{}
-	res, err := client.Do(req)
+	res, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return nil, err
 	}
