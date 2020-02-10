@@ -82,6 +82,9 @@ By providing ```ResponseDataType``` and ```SaveResponseTo``` package will try to
 
 #### Methods
 
+Request shortcuts:
+```Get(url string)```, ```Post(url string, data []byte)```, ```Put(url string, data []byte)```, ```Patch(url string, data []byte)``` and ```Delete(url string)```.
+
 These methods can be called on ```Make()``` response which is a ```easyreq.RequestResponse``` Type containing the original response from request sent with ```net/http``` package.
 
 ```
