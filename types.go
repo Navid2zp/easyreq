@@ -1,6 +1,8 @@
 package easyreq
 
-import "net/http"
+import (
+	"net/http"
+)
 
 type Request struct {
 	URL              string
@@ -13,5 +15,6 @@ type Request struct {
 }
 
 type RequestResponse struct {
-	Response *http.Response
+	Response       *http.Response
+	Header         http.Header
 }

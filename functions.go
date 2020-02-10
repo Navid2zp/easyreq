@@ -47,7 +47,7 @@ func (r *Request) Make() (*RequestResponse, error) {
 
 	defer res.Body.Close()
 
-	response := RequestResponse{Response: res}
+	response := RequestResponse{Response: res, Header: res.Header}
 
 	// Sends response to parseTo
 	// Only when you set a SaveResponseTo
@@ -82,6 +82,31 @@ func (r *Request) getData() ([]byte, error) {
 		}
 	}
 	return r.Data, nil
+}
+
+func Get(url string) (*RequestResponse, error) {
+	req := Request{Method: "GET", URL: url}
+	return req.Make()
+}
+
+func Delete(url string) (*RequestResponse, error) {
+	req := Request{Method: "DELETE", URL: url}
+	return req.Make()
+}
+
+func Post(url string, data []byte) (*RequestResponse, error) {
+	req := Request{Method: "POST", URL: url, Data: data}
+	return req.Make()
+}
+
+func Put(url string, data []byte) (*RequestResponse, error) {
+	req := Request{Method: "PUT", URL: url, Data: data}
+	return req.Make()
+}
+
+func Patch(url string, data []byte) (*RequestResponse, error) {
+	req := Request{Method: "PATCH", URL: url, Data: data}
+	return req.Make()
 }
 
 // Converts and saves to `r.ResponseDataType`
@@ -122,7 +147,7 @@ func Make(method, url string, data []byte, dataType, responseType string, saveTo
 	return res, err
 }
 
-// Unmarshals json response and saves into the given pointer
+// Unmarshals json response and saves it into the given pointer
 func (r *RequestResponse) ToJson(saveTo interface{}) error {
 	body, err := ioutil.ReadAll(r.Response.Body)
 	if err != nil {
