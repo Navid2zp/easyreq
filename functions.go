@@ -8,8 +8,10 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
+	"os"
 	"reflect"
 	"strings"
+	"time"
 )
 
 // Returns request method.
@@ -45,7 +47,9 @@ func (r *Request) Make() (*RequestResponse, error) {
 		return nil, err
 	}
 
-	defer res.Body.Close()
+	// Body won't be closed anymore
+	// You should call CloseBody() on response
+	//defer res.Body.Close()
 
 	response := RequestResponse{Response: res, Header: res.Header}
 
@@ -210,4 +214,21 @@ func (r *RequestResponse) Body() io.ReadCloser {
 // Reads response body into bytes and returns the result
 func (r *RequestResponse) ReadBody() ([]byte, error) {
 	return ioutil.ReadAll(r.Response.Body)
+}
+
+func (r *RequestResponse) CloseBody() error {
+	return r.Response.Body.Close()
+}
+
+func (r *RequestResponse) DownloadAsFile(fileName string) (*DownloadResult, error) {
+	st := time.Now()
+	out, err := os.Create(fileName)
+	if err != nil {
+		return nil, err
+	}
+	n, err := io.Copy(out, r.Response.Body)
+	return &DownloadResult{
+		BytesCopied:  n,
+		DownloadTime: time.Now().Sub(st),
+	}, err
 }

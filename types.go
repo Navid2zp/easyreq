@@ -2,6 +2,7 @@ package easyreq
 
 import (
 	"net/http"
+	"time"
 )
 
 type Request struct {
@@ -15,6 +16,11 @@ type Request struct {
 }
 
 type RequestResponse struct {
-	Response       *http.Response
-	Header         http.Header
+	Response *http.Response
+	Header   http.Header
+}
+
+type DownloadResult struct {
+	BytesCopied  int64
+	DownloadTime time.Duration
 }
