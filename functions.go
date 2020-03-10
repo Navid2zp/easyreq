@@ -216,10 +216,12 @@ func (r *RequestResponse) ReadBody() ([]byte, error) {
 	return ioutil.ReadAll(r.Response.Body)
 }
 
+// Close response body
 func (r *RequestResponse) CloseBody() error {
 	return r.Response.Body.Close()
 }
 
+// Downloads the body and saves it into the given path
 func (r *RequestResponse) DownloadAsFile(fileName string) (*DownloadResult, error) {
 	st := time.Now()
 	out, err := os.Create(fileName)
