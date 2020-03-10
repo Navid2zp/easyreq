@@ -45,8 +45,12 @@ func main() {
 		Headers: map[string]string{
 			"Content-Type": "application/json",
 		},
-	}
-	resp, err := ereq.Make()
+    }
+    resp, err := ereq.Make()
+    if err != nil {
+        fmt.Println(err)
+    }
+    defer resp.CloseBody()
 }
 ```
 
@@ -125,6 +129,13 @@ resp.Body()
 // Reads response body into bytes using `ioutil` and returns the result.
 Type: []byte, error
 resp.ReadBody()
+
+// Close response body
+resp.CloseBody()
+
+// Downloads the body and saves it into the given path.
+Type: DownloadResult, error
+resp.DownloadAsFile()
 ```
 
 You can also access the original response returned by ```http``` package by calling ```resp.Response```. (Will be a pointer to original response)
