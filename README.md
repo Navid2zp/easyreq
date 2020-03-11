@@ -135,7 +135,7 @@ resp.CloseBody()
 
 // Downloads the body and saves it into the given path.
 Type: DownloadResult, error
-resp.DownloadAsFile()
+resp.DownloadAsFile("myfile.zip")
 ```
 
 You can also access the original response returned by ```http``` package by calling ```resp.Response```. (Will be a pointer to original response)
