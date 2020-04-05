@@ -14,7 +14,7 @@ go get github.com/Navid2zp/easyreq
 
 ### Usage
 
-```
+```go
 import (
 	"github.com/Navid2zp/easyreq"
 )
@@ -56,7 +56,7 @@ func main() {
 
 You can also make a request using ```Make()``` function:
 
-```
+```go
 res, err := easyreq.Make(
 	"post", // Request method
 	"https://site.com/api", // URL
@@ -91,7 +91,7 @@ Request shortcuts:
 
 These methods can be called on ```Make()``` response which is a ```easyreq.RequestResponse``` Type containing the original response from request sent with ```net/http``` package.
 
-```
+```go
 // A pointer to your struct to save the data to.
 // Uses 'json' package to unmarshal the response body.
 // Returns error if anything goes wrong.
@@ -109,7 +109,7 @@ err := resp.ToString(&result)
 ```
 
 Other useful methods:
-```
+```go
 // Returns status code (200, ...)
 // Type: int
 resp.StatusCode()
