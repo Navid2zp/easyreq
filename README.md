@@ -134,7 +134,7 @@ resp.ReadBody()
 resp.CloseBody()
 
 // Downloads the body and saves it into the given path.
-Type: DownloadResult, error
+// Type: DownloadResult, error
 resp.DownloadAsFile("myfile.zip")
 ```
 
