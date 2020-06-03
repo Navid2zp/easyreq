@@ -2,6 +2,7 @@ package easyreq
 
 import (
 	"net/http"
+	"net/url"
 	"time"
 )
 
@@ -13,6 +14,7 @@ type Request struct {
 	RequestDataType  string
 	ResponseDataType string
 	SaveResponseTo   interface{}
+	Proxy            *url.URL
 }
 
 type RequestResponse struct {

@@ -8,6 +8,7 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 	"os"
 	"reflect"
 	"strings"
@@ -21,6 +22,14 @@ func (r *Request) getMethod() string {
 		return "GET"
 	}
 	return strings.ToUpper(r.Method)
+}
+
+// getClient returns the http client used to make the request
+func (r *Request) getClient() *http.Client {
+	if r.Proxy != nil {
+		return &http.Client{Transport: &http.Transport{Proxy: http.ProxyURL(r.Proxy)}}
+	}
+	return http.DefaultClient
 }
 
 // Send the final request
@@ -42,7 +51,7 @@ func (r *Request) Make() (*RequestResponse, error) {
 		req.Header.Set(key, value)
 	}
 
-	res, err := http.DefaultClient.Do(req)
+	res, err := r.getClient().Do(req)
 	if err != nil {
 		return nil, err
 	}
@@ -62,6 +71,14 @@ func (r *Request) Make() (*RequestResponse, error) {
 	// Returns a simple RequestResponse type
 	// So you can use response methods such as .json() later.
 	return &response, nil
+}
+
+// NewRequest creates a new request
+func NewRequest(method, url string) *Request {
+	return &Request{
+		URL:    url,
+		Method:method,
+	}
 }
 
 // Returns request data based on information provided
@@ -233,4 +250,15 @@ func (r *RequestResponse) DownloadAsFile(fileName string) (*DownloadResult, erro
 		BytesCopied:  n,
 		DownloadTime: time.Now().Sub(st),
 	}, err
+}
+
+// SetHeaders sets request headers
+func (r *Request) SetHeaders(headers map[string]string) {
+	r.Headers = headers
+}
+
+func (r *Request) SetProxy(proxy string) error {
+	proxyURL, err := url.Parse(proxy)
+	r.Proxy = proxyURL
+	return err
 }
