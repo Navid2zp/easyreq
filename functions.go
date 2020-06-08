@@ -38,11 +38,7 @@ func (r *Request) Make() (*RequestResponse, error) {
 	if err != nil {
 		return nil, err
 	}
-	data, err := r.getData()
-	if err != nil {
-		return nil, err
-	}
-	req, err := http.NewRequest(r.getMethod(), r.URL, bytes.NewBuffer(data))
+	req, err := http.NewRequest(r.getMethod(), r.URL, r.getData())
 	if err != nil {
 		return nil, err
 	}
@@ -81,28 +77,12 @@ func NewRequest(method, url string) *Request {
 	}
 }
 
-// Returns request data based on information provided
-// It will convert data type if it doesn't match what has been set as RequestDataType
-func (r *Request) getData() ([]byte, error) {
-	if r.RequestDataType != "" {
-		switch strings.ToLower(r.RequestDataType) {
-		case "json":
-			if !IsJson(r.Data) {
-				jsonData, err := json.Marshal(r.Data)
-				return jsonData, err
-			}
-			return r.Data, nil
-		case "xml":
-			if !IsXML(r.Data) {
-				xmlData, err := xml.Marshal(r.Data)
-				return xmlData, err
-			}
-			return r.Data, nil
-		default:
-			return r.Data, nil
-		}
+// getData returns request data
+func (r *Request) getData() io.Reader {
+	if r.Data != nil {
+		return bytes.NewReader(r.Data)
 	}
-	return r.Data, nil
+	return r.DataReader
 }
 
 func Get(url string) (*RequestResponse, error) {
@@ -223,6 +203,7 @@ func (r *RequestResponse) Headers() http.Header {
 	return r.Response.Header
 }
 
+
 // Returns response body
 func (r *RequestResponse) Body() io.ReadCloser {
 	return r.Response.Body
@@ -252,13 +233,48 @@ func (r *RequestResponse) DownloadAsFile(fileName string) (*DownloadResult, erro
 	}, err
 }
 
-// SetHeaders sets request headers
-func (r *Request) SetHeaders(headers map[string]string) {
-	r.Headers = headers
+// SetData sets data to request
+func (r *Request) SetData(data []byte) {
+	r.Data = data
 }
 
-func (r *Request) SetProxy(proxy string) error {
+// SetDataReader sets data reader for request
+func (r *Request) SetDataReader(reader io.Reader) {
+	r.DataReader = reader
+}
+
+// SetStringData sets request data from string
+func (r *Request) SetStringData(data string) {
+	r.DataReader = strings.NewReader(data)
+}
+
+// SetJsonData converts the data to json and adds it to request
+func (r *Request) SetJsonData(data interface{}) error {
+	var err error
+	r.Data, err = json.Marshal(data)
+	return err
+}
+
+// SetJsonData converts the data to XML and adds it to request
+func (r *Request) SetXMLData(data interface{}) error {
+	var err error
+	r.Data, err = xml.Marshal(data)
+	return err
+}
+
+// SetProxy sets proxy for request
+func (r *Request) SetHttpProxy(proxy string) error {
 	proxyURL, err := url.Parse(proxy)
 	r.Proxy = proxyURL
 	return err
+}
+
+// AddHeader adds a new header to request headers
+func (r *Request) AddHeader(key, value string) {
+	r.Headers[key] = value
+}
+
+// AddHeader adds a new header to request headers
+func (r *Request) SetHeaders(headers map[string]string) {
+	r.Headers = headers
 }

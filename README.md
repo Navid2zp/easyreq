@@ -5,8 +5,6 @@ This package uses builtin ```net/http``` to make requests.
 
 `json` and `xml` package will be used to unmarshal these types.
 
-For now there is no support for third party packages.
-
 ### Install
 ```
 go get github.com/Navid2zp/easyreq
@@ -19,33 +17,9 @@ import (
 	"github.com/Navid2zp/easyreq"
 )
 
-type MyData struct {
-	Name     string `json:"name" xml:"name"`
-	LastName string `json:"last_name" xml:"last_name"`
-	Github   string `json:"github" xml:"github"`
-}
 
 func main() {
-
-    sendData := MyData{
-      Name: "Navid",
-      LastName: "Zarepak",
-      Github: "Navid2zp",
-    }
-    
-    result := MyData{}
-    
-    ereq := easyreq.Request{
-		URL:              "https://site.com/api",
-		Method:           "post",
-		Data:             []byte(sendData),
-		RequestDataType:  "json",
-		ResponseDataType: "json",
-		SaveResponseTo:   &result,
-		Headers: map[string]string{
-			"Content-Type": "application/json",
-		},
-    }
+    ereq = easyreq.NewRequest("GET", "https://site.com/api")
     resp, err := ereq.Make()
     if err != nil {
         fmt.Println(err)
@@ -54,61 +28,95 @@ func main() {
 }
 ```
 
-You can also make a request using ```Make()``` function:
+##### Unmarshaling
+You can unmarshal the response directly:
 
 ```go
-res, err := easyreq.Make(
-	"post", // Request method
-	"https://site.com/api", // URL
-	[]byte(sendData), // Data to send
-	"json", // Request data type
-	"json", // Response data type
-	&result, map[string]string{"Content-Type": "application/json",}, // Headers
-)
-```
+type MyData struct {
+	Name     string `json:"name" xml:"name"`
+	LastName string `json:"last_name" xml:"last_name"`
+	Github   string `json:"github" xml:"github"`
+}
+var stringResult string
+var result MyData
 
-By providing ```ResponseDataType``` and ```SaveResponseTo``` package will try to parse the response to the given ```ResponseDataType``` and the result will be saved to where ```SaveResponseTo``` points.
-
-
-#### ```easyreq.Request``` Args
-
-|          Arg         |                            Description                      |          Type      |
-|----------------------|-------------------------------------------------------------|--------------------|
-|**URL**               | URL to send the request to.                                 | string           
-|**Method**            | Request method (default is get)                             | string
-|**Data**              | Data to send with request                                   | []byte
-|**RequestDataType**   | Data type for request (json, xml, string, ...)              | string
-|**ResponseDataType**  | Data type for response (Will be used to parse the response) | string
-|**SaveResponseTo**    | Where parsed data for response should be saved to           | pointer
-|**Headers**           | Request headers                                             | map[string]string
-
-
-
-#### Methods
-
-Request shortcuts:
-```Get(url string)```, ```Post(url string, data []byte)```, ```Put(url string, data []byte)```, ```Patch(url string, data []byte)``` and ```Delete(url string)```.
-
-These methods can be called on ```Make()``` response which is a ```easyreq.RequestResponse``` Type containing the original response from request sent with ```net/http``` package.
-
-```go
-// A pointer to your struct to save the data to.
-// Uses 'json' package to unmarshal the response body.
-// Returns error if anything goes wrong.
 err := resp.ToJson(&result)
-
-// A pointer to your struct to save the data to.
-// Uses 'xml' package to unmarshal the response body.
-// Returns error if anything goes wrong.
+// or xml:
 err := resp.ToXML(&result)
-
-// A pointer to a string.
-// Response body will be converted to string and saved to the given pointer.
-// Returns error if anything goes wrong.
-err := resp.ToString(&result)
+// Or string:
+err := resp.ToString(&stringResult)
 ```
 
-Other useful methods:
+##### Posting Data
+You pass any type of data to be posted with the request.
+
+###### Byte:
+```go
+ereq.SetData([]byte("this is my data"))
+```
+
+###### Reader:
+```go
+ereq.SetDataReader(strings.NewReader("this is my data"))
+```
+
+
+###### String:
+```go
+ereq.SetStringData("this is my data")
+```
+
+###### JSON/XML:
+```go
+sendData := MyData{
+      Name: "Navid",
+      LastName: "Zarepak",
+      Github: "Navid2zp",
+    }
+
+err := ereq.SetJsonData(sendData)
+err := ereq.SetXMLData(sendData)
+```
+
+##### Request header
+
+```go
+myHeaders := map[string]string{"myHeader": "Header Value"}
+ereq.SetHeaders(myHeaders)
+
+// Add a header:
+ereq.AddHeader("NewHeaderKey", "Value")
+```
+
+##### Download Files
+You can download files directly by calling ```DownloadAsFile``` method on a request response and providing a path to save the file.
+```go
+result, err := resp.DownloadAsFile("myfile.zip")
+
+fmt.Println("Bytes copied:", result.BytesCopied)
+fmt.Println("Download time:", result.DownloadTime)
+```
+
+##### Proxy
+
+
+```go
+ereq.SetHttpProxy("http://<PROXY_ADDRESS>:<PROXY_PORT>")
+```
+
+
+##### Request Shortcuts
+
+```go
+response, err := easyreq.Get("http://site.com")
+response, err := easyreq.Post("http://site.com", []byte("my data"))
+response, err := easyreq.Put("http://site.com", []byte("my data"))
+response, err := easyreq.Patch("http://site.com", []byte("my data"))
+response, err := easyreq.Delete("http://site.com")
+```
+
+##### Response Methods
+
 ```go
 // Returns status code (200, ...)
 // Type: int
@@ -133,9 +141,6 @@ resp.ReadBody()
 // Close response body
 resp.CloseBody()
 
-// Downloads the body and saves it into the given path.
-// Type: DownloadResult, error
-resp.DownloadAsFile("myfile.zip")
 ```
 
 You can also access the original response returned by ```http``` package by calling ```resp.Response```. (Will be a pointer to original response)

@@ -1,6 +1,7 @@
 package easyreq
 
 import (
+	"io"
 	"net/http"
 	"net/url"
 	"time"
@@ -10,6 +11,7 @@ type Request struct {
 	URL              string
 	Headers          map[string]string
 	Data             []byte
+	DataReader       io.Reader
 	Method           string
 	RequestDataType  string
 	ResponseDataType string
